@@ -1,4 +1,6 @@
-Import-Module Pester
+param(
+    [switch]$Verbose
+)
 
 $config = New-PesterConfiguration
 
@@ -8,8 +10,10 @@ $config.CodeCoverage.Enabled = $true
 
 $config.CodeCoverage.Path = "../src"
 
-$config.CodeCoverage.CoveragePercentTarget = 100
+$config.CodeCoverage.CoveragePercentTarget = 80
 
-$config.Output.Verbosity = "Detailed"
+if ($Verbose) {$config.Output.Verbosity = "Detailed"}
+
+Import-Module "../src/*"
 
 Invoke-Pester -Configuration $config

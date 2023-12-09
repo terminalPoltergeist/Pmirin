@@ -1,8 +1,3 @@
-BeforeAll {
-    $test = Split-Path -Parent $PSScriptRoot
-    Import-Module $test/src/AutomationWithLogs.psm1
-}
-
 Describe 'Initialize-Automation' {
     It 'creates empty $Automation from no inputs' {
         Initialize-Automation
