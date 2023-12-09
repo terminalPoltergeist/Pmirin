@@ -51,7 +51,12 @@ class action {
     [string]$name
     [scriptblock]$func
 
-    action([string]$name) {
+    action([action]$action) {
+        $this.name = $action.name
+        $this.func = $action.func
+    }
+
+   action([string]$name) {
         $this.name = $name
         $this.func = (Get-Command $this.name).ScriptBlock
     }
@@ -84,7 +89,7 @@ class automationWithLogs {
 
     Invoke() {
         # if no input or action is provided, run the stored $Automation.action on $Automation.inputs
-        $this.results = & ($this.action)($this.inputs)
+        $this.results = $this.action.Invoke($this.inputs)
         $this.logs = $this.logs + [log]::new("Running $($this.action.name)")
     }
 
@@ -103,7 +108,7 @@ class automationWithLogs {
     ) {
         # if an action and inputs are provided, run the action on the inputs
         $this.action = [action]::new($action)
-        $this.results = & $action($inputs)
+        $this.results = $this.action.Invoke($inputs)
         $this.logs = $this.logs + [log]::new("Running $($this.action.name)")
     }
 
