@@ -112,15 +112,16 @@ class automationWithLogs {
         $this.logs = $this.logs + [log]::new("Running $($this.action.name)")
     }
 
-    [string] ToString() {
-        $out = "Inputs:`n"
-        $out += "`t$(($this.inputs.GetEnumerator().ForEach({ "$($_.Name): $($_.Value)" }) -Join "`n`t"))`n"
-        $out += "Results:`n`t"
-        $out += ($this.results)
-        $out += "`nLogs:`n"
-        $out += ($this.logs)
-        return $out
-    }
+    # GetEnumerator causes single inputs (like ints) to fail
+    # [string] ToString() {
+    #     $out = "Inputs:`n"
+    #     $out += "`t$(($this.inputs.GetEnumerator().ForEach({ "$($_.Name): $($_.Value)" }) -Join "`n`t"))`n"
+    #     $out += "Results:`n`t"
+    #     $out += ($this.results)
+    #     $out += "`nLogs:`n"
+    #     $out += ($this.logs)
+    #     return $out
+    # }
 }
 
 function Initialize-Automation {
@@ -128,7 +129,8 @@ function Initialize-Automation {
         [object]$inputs
     )
     $auto = [automationWithLogs]::new($inputs)
-    New-Variable -Name Automation -Value $auto -Scope global -Force
+    try {New-Variable -Name Automation -Value $auto -Scope global -Force}
+    catch {throw "Automation failed to initialize."}
 }
 
 Export-ModuleMember -Function Initialize-Automation
