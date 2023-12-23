@@ -112,6 +112,8 @@ class automationWithLogs {
         $this.logs = $this.logs + [log]::new("Running $($this.action.name)")
     }
 
+    # TODO: Bind method that takes a new variable name and command, sets the variable to the output of the command and handles errors/throwing
+
     # GetEnumerator causes single inputs (like ints) to fail
     # [string] ToString() {
     #     $out = "Inputs:`n"
