@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE report PUBLIC "-//JACOCO//DTD Report 1.1//EN" "report.dtd"[]>
+<report name="Pester (12/23/2023 16:29:19)">
+  <sessioninfo id="this" start="1703348959425" dump="1703348959536" />
+  <package name="private">
+    <class name="private/AutomationWithLogs" sourcefilename="AutomationWithLogs.ps1">
+      <method name="log" desc="()" line="41">
+        <counter type="INSTRUCTION" missed="2" covered="0" />
+        <counter type="LINE" missed="2" covered="0" />
+        <counter type="METHOD" missed="1" covered="0" />
+      </method>
+      <method name="ToString" desc="()" line="45">
+        <counter type="INSTRUCTION" missed="3" covered="0" />
+        <counter type="LINE" missed="2" covered="0" />
+        <counter type="METHOD" missed="1" covered="0" />
+      </method>
+      <method name="action" desc="()" line="55">
+        <counter type="INSTRUCTION" missed="9" covered="0" />
+        <counter type="LINE" missed="8" covered="0" />
+        <counter type="METHOD" missed="1" covered="0" />
+      </method>
+      <method name="Invoke" desc="()" line="75">
+        <counter type="INSTRUCTION" missed="13" covered="0" />
+        <counter type="LINE" missed="9" covered="0" />
+        <counter type="METHOD" missed="1" covered="0" />
+      </method>
+      <method name="automationWithLogs" desc="()" line="87">
+        <counter type="INSTRUCTION" missed="1" covered="1" />
+        <counter type="LINE" missed="1" covered="1" />
+        <counter type="METHOD" missed="1" covered="0" />
+      </method>
+      <method name="Initialize-Automation" desc="()" line="133">
+        <counter type="INSTRUCTION" missed="1" covered="2" />
+        <counter type="LINE" missed="1" covered="2" />
+        <counter type="METHOD" missed="0" covered="1" />
+      </method>
+      <method name="&lt;script&gt;" desc="()" line="138">
+        <counter type="INSTRUCTION" missed="1" covered="0" />
+        <counter type="LINE" missed="1" covered="0" />
+        <counter type="METHOD" missed="1" covered="0" />
+      </method>
+      <counter type="INSTRUCTION" missed="30" covered="3" />
+      <counter type="LINE" missed="24" covered="3" />
+      <counter type="METHOD" missed="6" covered="1" />
+      <counter type="CLASS" missed="1" covered="0" />
+    </class>
+    <sourcefile name="AutomationWithLogs.ps1">
+      <line nr="41" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="42" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="45" mi="2" ci="0" mb="0" cb="0" />
+      <line nr="46" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="55" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="56" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="60" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="61" mi="2" ci="0" mb="0" cb="0" />
+      <line nr="65" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="66" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="70" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="71" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="75" mi="2" ci="0" mb="0" cb="0" />
+      <line nr="87" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="88" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="92" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="93" mi="2" ci="0" mb="0" cb="0" />
+      <line nr="100" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="101" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="102" mi="2" ci="0" mb="0" cb="0" />
+      <line nr="110" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="111" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="112" mi="2" ci="0" mb="0" cb="0" />
+      <line nr="133" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="134" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="135" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="138" mi="1" ci="0" mb="0" cb="0" />
+      <counter type="INSTRUCTION" missed="30" covered="3" />
+      <counter type="LINE" missed="24" covered="3" />
+      <counter type="METHOD" missed="6" covered="1" />
+      <counter type="CLASS" missed="1" covered="0" />
+    </sourcefile>
+    <counter type="INSTRUCTION" missed="30" covered="3" />
+    <counter type="LINE" missed="24" covered="3" />
+    <counter type="METHOD" missed="6" covered="1" />
+    <counter type="CLASS" missed="1" covered="0" />
+  </package>
+  <counter type="INSTRUCTION" missed="30" covered="3" />
+  <counter type="LINE" missed="24" covered="3" />
+  <counter type="METHOD" missed="6" covered="1" />
+  <counter type="CLASS" missed="1" covered="0" />
+</report>

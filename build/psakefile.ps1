@@ -1,3 +1,5 @@
+# This file defines the automation, configuration, testing, building, and deploying of the pmirin module
+
 FormatTaskName "-------- {0} --------"
 
 Properties {
@@ -19,6 +21,8 @@ Task Init {
     #Piping to Out-Host to get the formatter to output properly
     Get-Item Env:BH* | Out-Host
 
+    Import-Module "$($ProjectRoot)/src/pmirin.psd1"
+
     $commitMsg
 }
 
@@ -35,7 +39,7 @@ Task Test {
 
     if ($Verbose) {$config.Output.Verbosity = "Detailed"}
 
-    Import-Module "$($ProjectRoot)/src/pmirin.psd1"
-
     Invoke-Pester -Configuration $config
+
+    Move-Item -Path ./coverage.xml -Destination ./tests/ -Force
 }

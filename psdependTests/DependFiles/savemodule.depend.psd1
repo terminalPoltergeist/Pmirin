@@ -1,0 +1,5 @@
+﻿@{
+    'jenkins' = @{
+        target = 'TestDrive:/PSDependPesterTest'
+    }
+}
