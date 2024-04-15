@@ -32,8 +32,7 @@ function Install-Dotnet {
         } else {
             bash ./$installScript -c $Channel -v $Version --install-dir $InstallDir
         }
-    }
-    finally {
+    } finally {
         # delete the downloaded install script
         Remove-Item $installScript -Force -ErrorAction SilentlyContinue
     }

@@ -8,8 +8,7 @@ function Invoke-ExternalCommand {
     $result = $null
     $result = & $command @arguments  
     Write-Verbose "$($result | Out-String)"
-    if($Passthru)
-    {
+    if($Passthru) {
         $Result
     }
 }

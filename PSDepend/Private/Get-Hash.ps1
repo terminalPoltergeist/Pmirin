@@ -92,19 +92,15 @@
     )
     Process {
 
-        if($PSCmdlet.ParameterSetName -eq 'File')
-        {
+        if($PSCmdlet.ParameterSetName -eq 'File') {
             $Items = $Path
-        }
-        elseif($PSCmdlet.ParameterSetName -eq 'String')
-        {
+        } elseif($PSCmdlet.ParameterSetName -eq 'String') {
             $Items = $String
         }
 
         ForEach ($item in $Items) {
             
-            if($PSCmdlet.ParameterSetName -eq 'File')
-            {
+            if($PSCmdlet.ParameterSetName -eq 'File') {
 
                 $item = (Resolve-Path $item).ProviderPath
                 If (-Not ([uri]$item).IsAbsoluteUri) {
@@ -132,9 +128,7 @@
                     #If multiple algorithms are used, then they will be added to existing object                
                     $object = Add-Member -InputObject $Object -MemberType NoteProperty -Name $Type -Value $Hash -PassThru
                 }
-            }
-            elseif($PSCmdlet.ParameterSetName -eq 'String')
-            {
+            } elseif($PSCmdlet.ParameterSetName -eq 'String') {
 
                 $object = New-Object PSObject -Property @{ 
                     String = $item
@@ -154,8 +148,7 @@
             #Output an object with the hash, algorithm and path
             Write-Output $object
 
-            if($PSCmdlet.ParameterSetName -eq 'File')
-            {
+            if($PSCmdlet.ParameterSetName -eq 'File') {
                 #Close the stream
                 $stream.Close()
                 $stream.Dispose()

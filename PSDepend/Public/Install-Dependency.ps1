@@ -65,8 +65,7 @@ Function Install-Dependency {
 
         [switch]$Force
     )
-    Process
-    {
+    Process {
         Invoke-DependencyScript @PSBoundParameters -PSDependAction Install
     }
 }

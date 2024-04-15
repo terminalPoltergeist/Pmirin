@@ -5,10 +5,8 @@
         $Action = $PSDependAction,
         [string] $Version
     )
-    if($PSDependAction -contains 'Import')
-    {
-        foreach($Mod in $Name)
-        {
+    if($PSDependAction -contains 'Import') {
+        foreach($Mod in $Name) {
             Write-Verbose "Importing [$Mod]"
             $importParams = @{
                 Name = $Mod

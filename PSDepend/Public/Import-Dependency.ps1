@@ -60,8 +60,7 @@ Function Import-Dependency {
 
         [string[]]$Tags
     )
-    Process
-    {
+    Process {
         Invoke-DependencyScript @PSBoundParameters -PSDependAction Import
     }
 }

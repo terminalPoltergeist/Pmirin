@@ -7,12 +7,9 @@
     )
 
     $Existing = ( Get-Item -Path $Reference ).Value -split $Delimiter | Where-Object {$_ -ne $Item}
-    if($Append)
-    {
+    if($Append) {
         $ToAdd = ( @($Existing) + $Item | Select-Object -Unique ) -join $Delimiter
-    }
-    else
-    {
+    } else {
         $ToAdd = ( @($Item) + @($Existing) | Select-Object -Unique ) -join $Delimiter
     }
     Set-Item -Path $Reference -Value $ToAdd

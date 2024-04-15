@@ -169,18 +169,12 @@ function Get-Dependency {
         )
         # Check for preferred value, otherwise try to get value from key, otherwise use default....
         $Output = $Default
-        if($Prefer)
-        {
+        if($Prefer) {
             $Output = $Prefer
-        }
-        else
-        {
-            try
-            {
+        } else {
+            try {
                 $Output = $Options[$Name]
-            }
-            catch
-            {
+            } catch {
                 $Output = $Default
             }
         }
@@ -200,8 +194,7 @@ function Get-Dependency {
         [cmdletbinding()]
         param( $Value )
         $Output = $Value
-        switch($Value)
-        {
+        switch($Value) {
             {$_ -match '^\.$|^\.\\|^\./'}{
                 $Output = $Output -replace '^\.', $PWD.Path
             }
@@ -240,14 +233,12 @@ function Get-Dependency {
 
         # Global settings....
         $PSDependOptions = $null
-        if($Dependencies.Containskey('PSDependOptions'))
-        {
+        if($Dependencies.Containskey('PSDependOptions')) {
             $PSDependOptions = $Dependencies.PSDependOptions
             $Dependencies.Remove('PSDependOptions')
         }
 
-        foreach($Dependency in $Dependencies.keys)
-        {
+        foreach($Dependency in $Dependencies.keys) {
             $DependencyHash = $Dependencies.$Dependency
             $DependencyType = Get-GlobalOption -Name DependencyType
 
@@ -257,8 +248,7 @@ function Get-Dependency {
             If( $DependencyHash -is [string] -and
                 $Dependency -match '::' -and
                 ($Dependency -split '::').count -eq 2
-            )
-            {
+            ) {
                 [pscustomobject]@{
                     PSTypeName = 'PSDepend.Dependency'
                     DependencyFile = $DependencyFile
@@ -283,8 +273,8 @@ function Get-Dependency {
             elseif( $DependencyHash -is [string] -and
                 $Dependency -notmatch '/' -and
                 -not $DependencyType -or
-                $DependencyType -eq 'PSGalleryModule')
-            {
+                $DependencyType -eq 'PSGalleryModule'
+            ) {
                 [pscustomobject]@{
                     PSTypeName = 'PSDepend.Dependency'
                     DependencyFile = $DependencyFile
@@ -310,8 +300,8 @@ function Get-Dependency {
                    $Dependency -match '/' -and
                    $Dependency.split('/').count -eq 2 -and
                    -not $DependencyType -or
-                   $DependencyType -eq 'GitHub')
-            {
+                   $DependencyType -eq 'GitHub'
+            ) {
                 [pscustomobject]@{
                     PSTypeName = 'PSDepend.Dependency'
                     DependencyFile = $DependencyFile
@@ -335,8 +325,8 @@ function Get-Dependency {
             elseif($DependencyHash -is [string] -and
                    $Dependency -match '/' -and
                    -not $DependencyType -or
-                   $DependencyType -eq 'Git' )
-            {
+                   $DependencyType -eq 'Git' 
+            ) {
                 [pscustomobject]@{
                     PSTypeName = 'PSDepend.Dependency'
                     DependencyFile = $DependencyFile
@@ -355,13 +345,10 @@ function Get-Dependency {
                     PSDependOptions = $PSDependOptions
                     Raw = $null
                 }
-            }
-            else
-            {
+            } else {
                 # Parse dependency hash format
                 # Default type is module, unless it's in a git-style format
-                if(-not $DependencyHash.DependencyType)
-                {
+                if(-not $DependencyHash.DependencyType) {
                     # Is it a global option?
                     if($DependencyType) {}
                     # GitHub first
@@ -373,25 +360,17 @@ function Get-Dependency {
                         ($DependencyHash.Name -match '/' -and
                             ($DependencyHash -is [string] -and $DependencyHash.split('/').count -eq 2)
                         )
-                    )
-                    {
+                    ) {
                         $DependencyType = 'GitHub'
-                    }
-                    # Now git...
-                    elseif(
+                    } elseif( # Now git...
                         ($Dependency -match '/' -and -not $Dependency.Name) -or
                         $DependencyHash.Name -match '/'
-                    )
-                    {
+                    ) {
                         $DependencyType = 'Git'
-                    }
-                    else # finally, psgallerymodule
-                    {
+                    } else { # finally, psgallerymodule 
                         $DependencyType = 'PSGalleryModule'
                     }
-                }
-                else
-                {
+                } else {
                     $DependencyType = $DependencyHash.DependencyType
                 }
 
@@ -439,25 +418,19 @@ function Get-Dependency {
 		return $credential
 	}
 
-    if($PSCmdlet.ParameterSetName -eq 'File')
-    {
-        $ParsedDependencies = foreach($DependencyPath in $Path)
-        {
+    if($PSCmdlet.ParameterSetName -eq 'File') {
+        $ParsedDependencies = foreach($DependencyPath in $Path) {
             #Resolve relative paths... Thanks Oisin! http://stackoverflow.com/a/3040982/3067642
             $DependencyPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($DependencyPath)
 
-            if(Test-Path $DependencyPath -PathType Container)
-            {
+            if(Test-Path $DependencyPath -PathType Container) {
                 $DependencyFiles = @( Resolve-DependScripts -Path $DependencyPath -Recurse $Recurse )
-            }
-            else
-            {
+            } else {
                 $DependencyFiles = @( $DependencyPath )
             }
             $DependencyFiles = $DependencyFiles | Select-Object -Unique
 
-            foreach($DependencyFile in $DependencyFiles)
-            {
+            foreach($DependencyFile in $DependencyFiles) {
                 # Read the file
                 $Base = Split-Path $DependencyFile -Parent
                 $File = Split-Path $DependencyFile -Leaf
@@ -466,23 +439,18 @@ function Get-Dependency {
                 Parse-Dependency -ParamSet $PSCmdlet.ParameterSetName
             }
         }
-    }
-    elseif($PSCmdlet.ParameterSetName -eq 'Hashtable')
-    {
+    } elseif($PSCmdlet.ParameterSetName -eq 'Hashtable') {
         $DependencyFile = 'Hashtable'
-        $ParsedDependencies = foreach($InputDependency in $InputObject)
-        {
+        $ParsedDependencies = foreach($InputDependency in $InputObject) {
             $Dependencies = $InputDependency
 
             Parse-Dependency -ParamSet $PSCmdlet.ParameterSetName
         }
     }
 
-    If($PSBoundParameters.ContainsKey('Tags'))
-    {
+    If($PSBoundParameters.ContainsKey('Tags')) {
         $ParsedDependencies = Get-TaggedDependency -Dependency $ParsedDependencies -Tags $Tags
-        if(-not $ParsedDependencies)
-        {
+        if(-not $ParsedDependencies) {
             Write-Warning "No dependencies found with tags '$tags'"
             return
         }

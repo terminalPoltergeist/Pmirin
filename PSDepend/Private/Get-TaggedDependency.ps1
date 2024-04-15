@@ -5,18 +5,14 @@
     )
 
     # Only return dependency with all specified tags
-    foreach($Depend in $Dependency)
-    {
+    foreach($Depend in $Dependency) {
         $Include = $False
-        foreach($Tag in @($Tags))
-        {
-            if($Depend.Tags -contains $Tag)
-            {
+        foreach($Tag in @($Tags)) {
+            if($Depend.Tags -contains $Tag) {
                 $Include = $True
             }
         }
-        If($Include)
-        {
+        if ($Include) {
             $Depend
         }
     }

@@ -79,39 +79,28 @@ Function Get-PSDependType {
     $KeysToQuery = $DependencyDefinitions.Keys |
         Where-Object {$_ -like $DependencyType} |
         Sort-Object
-    foreach($Type in $KeysToQuery)
-    {
+    foreach($Type in $KeysToQuery) {
         #Determine the path to this script. Skip task dependencies...
         $Script =  $DependencyDefinitions.$Type.Script
-        if($Script -ne '.')
-        {
-            if(Test-Path $Script)
-            {
+        if($Script -ne '.') {
+            if(Test-Path $Script) {
                 $ScriptPath = $Script
-            }
-            else
-            {
+            } else {
                 # account for missing ps1
                 $ScriptPath = Join-Path $ModuleRoot "PSDependScripts\$($Script -replace ".ps1$").ps1"
             }
 
             If (-not $SkipHelp) {
-                Try
-                {
+                Try {
                     $ScriptHelp = Get-Help $ScriptPath -Full -ErrorAction Stop
-                }
-                Catch
-                {
+                } Catch {
                     $ScriptHelp = "Error retrieving help: $_"
                 }
             }
         }
-        if($ShowHelp)
-        {
+        if($ShowHelp) {
             $ScriptHelp
-        }
-        else
-        {
+        } else {
             $Support = @($DependencyDefinitions.$Type.Supports)
             [pscustomobject]@{
                 DependencyType = $Type

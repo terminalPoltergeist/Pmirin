@@ -19,25 +19,19 @@ function Find-NugetPackage {
     )
 
     #Ugly way to do this.  Prefer islatest, otherwise look for version, otherwise grab all matching modules
-    if($IsLatest)
-    {
+    if($IsLatest) {
         Write-Verbose "Searching for latest [$name] module"
         $URI = "${PackageSourceUrl}Packages?`$filter=Id eq '$name' and IsLatestVersion"
-    }
-    elseif($PSBoundParameters.ContainsKey($Version))
-    {
+    } elseif($PSBoundParameters.ContainsKey($Version)) {
         Write-Verbose "Searching for version [$version] of [$name]"
         $URI = "${PackageSourceUrl}Packages?`$filter=Id eq '$name' and Version eq '$Version'"
-    }
-    else
-    {
+    } else {
         Write-Verbose "Searching for all versions of [$name] module"
         $URI = "${PackageSourceUrl}Packages?`$filter=Id eq '$name'"
     }
 
     $headers = @{}
-    if ($null -ne $Credential)
-    {
+    if ($null -ne $Credential) {
         $basicAuthToken = [Convert]::ToBase64String(":$($Credential.GetNetworkCredential().Password)")
 
         $headers["X-NuGet-ApiKey"] = $Credential.UserName

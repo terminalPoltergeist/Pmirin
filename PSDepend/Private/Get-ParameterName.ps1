@@ -17,13 +17,9 @@ Function Get-ParameterName {
                                 "Whatif" ),
         [string[]]$exclude = $( "Passthru", "Commit" )
     )
-    if($parameterset)
-    {
+    if($parameterset) {
         ((Get-Command -name $command).ParameterSets | Where-Object {$_.name -eq $parameterset} ).Parameters.Name | Where-Object {($exclude + $excludeDefault) -notcontains $_}
-    }
-
-    else
-    {
+    } else {
         ((Get-Command -name $command).ParameterSets | Where-Object {$_.name -eq "__AllParameterSets"} ).Parameters.Name | Where-Object {($exclude + $excludeDefault) -notcontains $_}
     }
 }

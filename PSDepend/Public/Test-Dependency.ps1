@@ -66,8 +66,7 @@ Function Test-Dependency {
 
         [switch]$Quiet
     )
-    process
-    {
+    process {
         Invoke-DependencyScript @PSBoundParameters -PSDependAction Test
     }
 }
