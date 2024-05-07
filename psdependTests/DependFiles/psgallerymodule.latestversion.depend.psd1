@@ -1,5 +1,0 @@
-﻿@{
-    'imaginary' = @{
-        Version = 'latest'
-    }
-}

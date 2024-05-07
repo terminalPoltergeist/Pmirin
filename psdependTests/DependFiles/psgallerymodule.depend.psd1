@@ -1,3 +1,0 @@
-﻿@{
-    'jenkins' = 'latest'
-}
