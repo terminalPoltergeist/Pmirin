@@ -1,3 +1,5 @@
+
+$ModuleRoot = $PSScriptRoot
 # REGION source public and private functions
 $dotSourceParams = @{
     Filter      = '*.ps1'
@@ -15,3 +17,5 @@ foreach ($import in @($public + $private)) {
         throw "Unable to source [$($import.FullName)]"
     }
 }
+# ENDREGION
+
