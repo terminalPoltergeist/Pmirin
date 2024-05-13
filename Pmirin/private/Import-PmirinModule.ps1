@@ -1,11 +1,11 @@
-﻿function Import-PSDependModule {
+﻿function Import-PmirinModule {
     [cmdletbinding()]
     param (
         [string[]]$Name = $ModulePath,
-        $Action = $PSDependAction,
+        $Action = $PmirinAction,
         [string] $Version
     )
-    if($PSDependAction -contains 'Import') {
+    if($PmirinAction -contains 'Import') {
         foreach($Mod in $Name) {
             Write-Verbose "Importing [$Mod]"
             $importParams = @{

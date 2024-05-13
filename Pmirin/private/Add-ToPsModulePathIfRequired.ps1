@@ -1,7 +1,7 @@
 function Add-ToPsModulePathIfRequired {
     [cmdletbinding()]
     param(
-        [PSTypeName('PSDepend.Dependency')]
+        [PSTypeName('Pmirin.Dependency')]
         [psobject]$Dependency,
         [string[]]$Action
     )
