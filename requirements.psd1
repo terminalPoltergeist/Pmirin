@@ -1,8 +1,10 @@
 ﻿@{
-    buildhelpers = @{
-        target = 'CurrentUser'
-        source = 'PSGalleryModule'
+    "terminalPoltergeist/Pmirin" = @{
+        Version = 'v0.0.1'
+        DependencyType = 'GitHub'
+        Parameters = @{
+            ExtractPath = 'Pmirin/*'
+        }
+        Credential = 'Bearer'
     }
-    pester = 'latest' 
-    psake = '4.6.0'
 }

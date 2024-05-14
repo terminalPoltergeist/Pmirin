@@ -187,9 +187,11 @@ if($DependencyVersion -eq "") {
     $DependencyVersion = "latest"
 }
 
-# check if dependency version is a semantic version
-if($DependencyVersion -match "^\d+(?:\.\d+)+$") {
-    $DependencyVersion = New-Object "System.Version" $DependencyVersion
+# check if dependency version is a semantic version, with or without a 'v' prefix
+if($DependencyVersion -match "^v?\d+(?:\.\d+)+$") {
+    $match = $DependencyVersion | Select-String -Pattern "^v?(\d+(?:\.\d+)+)$"
+    $SemanticVersion = [System.Version]($match.Matches.Groups | Where-Object Name -eq 1).Value
+    # $DependencyVersion = New-Object "System.Version" $semanticVersion
 }
 
 if ($script:IsCoreCLR) {
@@ -244,6 +246,7 @@ if($DependencyTarget) {
 
 Write-Verbose -Message "Dependency id: [$DependencyID]"
 Write-Verbose -Message "Dependency version: [$DependencyVersion]"
+Write-Verbose -Message "Dependency semantic version: [$SemanticVersion]"
 Write-Verbose -Message "Dependency target: [$DependencyTarget]"
 Write-Verbose -Message "Dependency name: [$DependencyName]"
 Write-Verbose -Message "Target Path: [$TargetPath]"
@@ -268,16 +271,16 @@ if($ModuleExisting) {
     $ExistingVersions = $Module | Select-Object -ExpandProperty "Version"
 
     # Check if the version that is should be used is a version number
-    if($DependencyVersion -match "^\d+(?:\.\d+)+$") {
+    if($SemanticVersion) {
         :versionslocal foreach($ExistingVersion in $ExistingVersions) {
-            switch($ExistingVersion.CompareTo($DependencyVersion)) {
+            switch($ExistingVersion.CompareTo($SemanticVersion)) {
                 {@(-1, 1) -contains $_} {
-                    Write-Verbose "For [$DependencyName], the version you specified [$DependencyVersion] does not match the already existing version [$ExistingVersion]"
+                    Write-Verbose "For [$DependencyName], the version you specified [$SemanticVersion] does not match the already existing version [$ExistingVersion]"
                     $ShouldInstall = $true
                     break
                 }
                 0 {
-                    Write-Verbose "For [$DependencyName], the version you specified [$DependencyVersion] matches the already existing version [$ExistingVersion]"
+                    Write-Verbose "For [$DependencyName], the version you specified [$SemanticVersion] matches the already existing version [$ExistingVersion]"
                     $ShouldInstall = $false
                     $ModuleExistingMatches = $true
                     break versionslocal
@@ -304,18 +307,29 @@ if($ShouldInstall) {
         :nullcheck while($GitHubVersion -Eq $null) {
             $Page++
             [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
-            $GitHubTags = Invoke-RestMethod -Uri "https://api.github.com/repos/$DependencyID/tags?per_page=100&page=$Page"
+            try {
+                $GitHubTags = Invoke-RestMethod -Uri "https://api.github.com/repos/$DependencyID/tags?per_page=100&page=$Page"
+            } catch {
+                if ($Dependency.Credential){
+                    $GitHubTags = Invoke-RestMethod -Uri "https://api.github.com/repos/$DependencyID/tags?per_page=100&page=$Page" -Headers @{"Authorization" = "Bearer $($Dependency.Credential)"}
+                } else {
+                    throw $_
+                }
+            }
 
             if($GitHubTags) {
                 foreach($GitHubTag in $GitHubTags) {
-                    if($GitHubTag.name -match "^\d+(?:\.\d+)+$" -and ($DependencyVersion -match "^\d+(?:\.\d+)+$" -or $DependencyVersion -eq "latest")) {
+                    if($GitHubTag.name -match "^v?\d+(?:\.\d+)+$" -and ($SemanticVersion -or $DependencyVersion -eq "latest")) {
+                        $match = $GitHubTag.Name | Select-String -Pattern "^v?(\d+(?:\.\d+)+)$"
+                        $GitHubSemanticVersion = [System.Version]($match.Matches.Groups | Where-Object Name -eq 1).Value
                         $GitHubVersion = New-Object "System.Version" $GitHubTag.name
 
                         if($DependencyVersion -Eq "latest") {
+                            $SemanticVersion = $GitHubSemanticVersion
                             $DependencyVersion = $GitHubVersion
                         }
 
-                        switch($DependencyVersion.CompareTo($GitHubVersion)) {
+                        switch($SemanticVersion.CompareTo($GitHubSemanticVersion)) {
                             -1 {
                                 # Version is older compared to the GitHub version, continue searching
                                 break
@@ -349,9 +363,9 @@ if($ShouldInstall) {
             :versionsremote foreach($ExistingVersion in $ExistingVersions) {
                 # Because a remote and a local version exist
                 # Prevent a module from getting installed twice
-                switch($ExistingVersion.CompareTo($GitHubVersion)) {
+                switch($ExistingVersion.CompareTo($GitHubSemanticVersion)) {
                     {@(-1, 1) -contains $_} {
-                        Write-Verbose "For [$DependencyName], you have a different version [$ExistingVersion] compared to the version available on GitHub [$GitHubVersion]"
+                        Write-Verbose "For [$DependencyName], you have a different version [$ExistingVersion] compared to the version available on GitHub [$GitHubSemanticVersion]"
                         break
                     }
                     0 {
@@ -367,7 +381,7 @@ if($ShouldInstall) {
         Write-Verbose "[$DependencyID] has no tags on GitHub or [$DependencyVersion] is a branchname"
         # Translate version "latest" to "master"
         if($DependencyVersion -eq "latest") {
-            $DependencyVersion = "master"
+            $DependencyVersion = "main"
         }
 
         # Link for a .zip archive of the repository's branch
@@ -443,7 +457,7 @@ if(($PmirinAction -contains 'Install') -and $ShouldInstall) {
 
     if($TargetType -eq 'Exact') {
         $Destination = $TargetPath
-    } elseif($DependencyVersion -match "^\d+(?:\.\d+)+$" -and $PSVersionTable.PSVersion -ge '5.0'  ) {
+    } elseif($SemanticVersion -match "^\d+(?:\.\d+)+$" -and $PSVersionTable.PSVersion -ge '5.0'  ) {
         # For versioned GitHub tags
         $Destination = Join-Path $TargetPath $DependencyVersion
     } elseif(($DependencyVersion -eq "latest") -and ($RemoteAvailable) -and $PSVersionTable.PSVersion -ge '5.0' ) {
