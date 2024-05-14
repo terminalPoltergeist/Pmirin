@@ -182,89 +182,62 @@ $DependencyVersion = $Dependency.Version
 $DependencyTarget = $Dependency.Target
 $DependencyName = $DependencyID.Split("/")[1]
 
-# Translate "" to "latest"
-if($DependencyVersion -eq "")
-{
+# defaults to the latest version of the dependency
+if($DependencyVersion -eq "") {
     $DependencyVersion = "latest"
 }
 
-# Check if the version that should be used is a version number
-if($DependencyVersion -match "^\d+(?:\.\d+)+$")
-{
+# check if dependency version is a semantic version
+if($DependencyVersion -match "^\d+(?:\.\d+)+$") {
     $DependencyVersion = New-Object "System.Version" $DependencyVersion
 }
 
 if ($script:IsCoreCLR) {
     $ModuleChildPath = "PowerShell\Modules"
-}
-else
-{
+} else {
     $ModuleChildPath = "WindowsPowerShell\Modules"
 }
 
 # Get system installation path
-if($script:IsWindows)
-{
+if($script:IsWindows) {
     $AllUsersPath = Join-Path -Path $env:ProgramFiles -ChildPath $ModuleChildPath
-}
-else
-{
+} else {
     $AllUsersPath = [System.Management.Automation.Platform]::SelectProductNameForDirectory('SHARED_MODULES')
 }
 
 # Check if the MyDocuments folder path is accessible
-try
-{
+try {
     $MyDocumentsFolderPath = [Environment]::GetFolderPath("MyDocuments")
-}
-catch
-{
+} catch {
     $MyDocumentsFolderPath = $null
 }
 
 # Get user installation path
-if($script:IsWindows)
-{
-    if($MyDocumentsFolderPath)
-    {
+if($script:IsWindows) {
+    if($MyDocumentsFolderPath) {
         $CurrentUserPath = Join-Path -Path $MyDocumentsFolderPath -ChildPath $ModuleChildPath
-    }
-    else
-    {
+    } else {
         $CurrentUserPath = Join-Path -Path $HOME -ChildPath "Documents\$ModuleChildPath"
     }
-}
-else
-{
+} else {
     $CurrentUserPath = [System.Management.Automation.Platform]::SelectProductNameForDirectory('USER_MODULES')
 }
 
 # Set target path
-if($DependencyTarget)
-{
+if($DependencyTarget) {
     # Resolve scope keywords
-    if($DependencyTarget -Eq "CurrentUser")
-    {
+    if($DependencyTarget -Eq "CurrentUser") {
         $TargetPath = $CurrentUserPath
-    }
-    elseif($DependencyTarget -Eq "AllUsers")
-    {
+    } elseif($DependencyTarget -Eq "AllUsers") {
         $TargetPath = $AllUsersPath
-    }
-    else
-    {
+    } else {
         $TargetPath = $DependencyTarget
     }
-}
-else
-{
+} else {
     # Set default target depending on admin permissions
-    if(($script:IsWindows) -And (([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")))
-    {
+    if(($script:IsWindows) -And (([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator"))) {
         $TargetPath = $AllUsersPath
-    }
-    else
-    {
+    } else {
         $TargetPath = $CurrentUserPath
     }
 }
@@ -284,27 +257,20 @@ $ShouldInstall = $false
 $RemoteAvailable = $false
 $URL = $null
 
-if($Module)
-{
+if($Module) {
     $ModuleExisting = $true
-}
-else
-{
+} else {
     $ModuleExisting = $false
 }
 
-if($ModuleExisting)
-{
+if($ModuleExisting) {
     Write-Verbose "Found existing module [$DependencyName]"
     $ExistingVersions = $Module | Select-Object -ExpandProperty "Version"
 
     # Check if the version that is should be used is a version number
-    if($DependencyVersion -match "^\d+(?:\.\d+)+$")
-    {
-        :versionslocal foreach($ExistingVersion in $ExistingVersions)
-        {
-            switch($ExistingVersion.CompareTo($DependencyVersion))
-            {
+    if($DependencyVersion -match "^\d+(?:\.\d+)+$") {
+        :versionslocal foreach($ExistingVersion in $ExistingVersions) {
+            switch($ExistingVersion.CompareTo($DependencyVersion)) {
                 {@(-1, 1) -contains $_} {
                     Write-Verbose "For [$DependencyName], the version you specified [$DependencyVersion] does not match the already existing version [$ExistingVersion]"
                     $ShouldInstall = $true
@@ -318,50 +284,38 @@ if($ModuleExisting)
                 }
             }
         }
-    }
-    else
-    {
+    } else {
         # The version that is to be used is probably a GitHub branch name
         $ShouldInstall = $true
     }
-}
-else
-{
+} else {
     Write-Verbose "Did not find existing module [$DependencyName]"
     $ShouldInstall = $true
 }
 
 # Skip the case when the version that is to be used already exists
-if($ShouldInstall)
-{
+if($ShouldInstall) {
     # API-fetch the tags on GitHub
     $GitHubVersion = $null
     $GitHubTag = $null
     $Page = 0
 
-    try
-    {
-        :nullcheck while($GitHubVersion -Eq $null)
-        {
+    try {
+        :nullcheck while($GitHubVersion -Eq $null) {
             $Page++
             [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
             $GitHubTags = Invoke-RestMethod -Uri "https://api.github.com/repos/$DependencyID/tags?per_page=100&page=$Page"
 
-            if($GitHubTags)
-            {
-                foreach($GitHubTag in $GitHubTags)
-                {
-                    if($GitHubTag.name -match "^\d+(?:\.\d+)+$" -and ($DependencyVersion -match "^\d+(?:\.\d+)+$" -or $DependencyVersion -eq "latest"))
-                    {
+            if($GitHubTags) {
+                foreach($GitHubTag in $GitHubTags) {
+                    if($GitHubTag.name -match "^\d+(?:\.\d+)+$" -and ($DependencyVersion -match "^\d+(?:\.\d+)+$" -or $DependencyVersion -eq "latest")) {
                         $GitHubVersion = New-Object "System.Version" $GitHubTag.name
 
-                        if($DependencyVersion -Eq "latest")
-                        {
+                        if($DependencyVersion -Eq "latest") {
                             $DependencyVersion = $GitHubVersion
                         }
 
-                        switch($DependencyVersion.CompareTo($GitHubVersion))
-                        {
+                        switch($DependencyVersion.CompareTo($GitHubVersion)) {
                             -1 {
                                 # Version is older compared to the GitHub version, continue searching
                                 break
@@ -378,32 +332,24 @@ if($ShouldInstall)
                         }
                     }
                 }
-            }
-            else
-            {
+            } else {
                 break nullcheck
             }
         }
-    }
-    catch
-    {
+    } catch {
         # Repository does not seem to exist or a branch is the target
         $ShouldInstall = $false
         Write-Warning "Could not find module on GitHub: $_"
     }
 
-    if($RemoteAvailable)
-    {
+    if($RemoteAvailable) {
         # Use the tag's link
         $URL = $GitHubTag.zipball_url
-        if($ExistingVersions)
-        {
-            :versionsremote foreach($ExistingVersion in $ExistingVersions)
-            {
+        if($ExistingVersions) {
+            :versionsremote foreach($ExistingVersion in $ExistingVersions) {
                 # Because a remote and a local version exist
                 # Prevent a module from getting installed twice
-                switch($ExistingVersion.CompareTo($GitHubVersion))
-                {
+                switch($ExistingVersion.CompareTo($GitHubVersion)) {
                     {@(-1, 1) -contains $_} {
                         Write-Verbose "For [$DependencyName], you have a different version [$ExistingVersion] compared to the version available on GitHub [$GitHubVersion]"
                         break
@@ -417,13 +363,10 @@ if($ShouldInstall)
                 }
             }
         }
-    }
-    else
-    {
+    } else {
         Write-Verbose "[$DependencyID] has no tags on GitHub or [$DependencyVersion] is a branchname"
         # Translate version "latest" to "master"
-        if($DependencyVersion -eq "latest")
-        {
+        if($DependencyVersion -eq "latest") {
             $DependencyVersion = "master"
         }
 
@@ -433,35 +376,33 @@ if($ShouldInstall)
     }
 }
 
-if ($TargetType -ne 'Exact')
-{
+if ($TargetType -ne 'Exact') {
     $TargetPath = Join-Path $TargetPath $DependencyName
 }
 
 # Install action needs to be wanted and logical
-if(($PmirinAction -contains 'Install') -and $ShouldInstall)
-{
+if(($PmirinAction -contains 'Install') -and $ShouldInstall) {
     # Create a temporary directory and download the repository to it
     $OutPath = Join-Path ([System.IO.Path]::GetTempPath()) ([guid]::NewGuid().guid)
     New-Item -ItemType Directory -Path $OutPath -Force | Out-Null
     $OutFile = Join-Path $OutPath "$DependencyVersion.zip"
-    Invoke-RestMethod -Uri $URL -OutFile $OutFile
+    if ($null -eq $Dependency.Credential) {
+        Invoke-RestMethod -Uri $URL -OutFile $OutFile
+    } else {
+        Invoke-RestMethod -Uri $URL -OutFile $OutFile -Headers @{"Authorization" = "Bearer $($Dependency.Credential)"}
+    }
 
-    if(-not (Test-Path $OutFile))
-    {
+    if(-not (Test-Path $OutFile)) {
         Write-Error "Could not download [$URL] to [$OutFile]. See error details and verbose output for more information"
         return
     }
 
     # Extract the zip file
-    if($script:IsWindows)
-    {
+    if($script:IsWindows) {
         $ZipFile = (New-Object -com shell.application).NameSpace($OutFile)
         $ZipDestination = (New-Object -com shell.application).NameSpace($OutPath)
         $ZipDestination.CopyHere($ZipFile.Items())
-    }
-    else
-    {
+    } else {
         # If not on Windows "Expand-Archive" should be available as PS version 6 is considered minimum.
         Expand-Archive $OutFile -DestinationPath $OutPath
     }
@@ -472,30 +413,21 @@ if(($PmirinAction -contains 'Install') -and $ShouldInstall)
     $OutPath = (Get-ChildItem -Path $OutPath)[0].FullName
     $OutPath = (Rename-Item -Path $OutPath -NewName $DependencyName -PassThru).FullName
 
-    if($ExtractPath)
-    {
+    if($ExtractPath) {
         # Filter only the contents wanted
-        [string[]]$ToCopy = foreach($RelativePath in $ExtractPath)
-        {
+        [string[]]$ToCopy = foreach($RelativePath in $ExtractPath) {
             $AbsolutePath = Join-Path $OutPath $RelativePath
-            if(-not (Test-Path $AbsolutePath))
-            {
+            if(-not (Test-Path $AbsolutePath)) {
                 Write-Warning "Expected ExtractPath [$RelativePath], did not find at [$AbsolutePath]"
-            }
-            else
-            {
+            } else {
                 $AbsolutePath
             }
         }
-    }
-    elseif($ExtractProject)
-    {
+    } elseif($ExtractProject) {
         # Filter only the project contents
         $ProjectDetails = Get-ProjectDetail -Path $OutPath
         [string[]]$ToCopy = $ProjectDetails.Path
-    }
-    else
-    {
+    } else {
         # Use the standard download path
         [string[]]$ToCopy = $OutPath
     }
@@ -503,47 +435,35 @@ if(($PmirinAction -contains 'Install') -and $ShouldInstall)
     Write-Verbose "Contents that will be copied: $ToCopy"
 
     # Copy the contents to their target
-    if(-not (Test-Path $TargetPath))
-    {
+    if(-not (Test-Path $TargetPath)) {
         New-Item $TargetPath -ItemType "directory" -Force
     }
 
     $Destination = $null
 
-    if($TargetType -eq 'Exact')
-    {
+    if($TargetType -eq 'Exact') {
         $Destination = $TargetPath
-    }
-    elseif($DependencyVersion -match "^\d+(?:\.\d+)+$" -and $PSVersionTable.PSVersion -ge '5.0'  )
-    {
+    } elseif($DependencyVersion -match "^\d+(?:\.\d+)+$" -and $PSVersionTable.PSVersion -ge '5.0'  ) {
         # For versioned GitHub tags
         $Destination = Join-Path $TargetPath $DependencyVersion
-    }
-    elseif(($DependencyVersion -eq "latest") -and ($RemoteAvailable) -and $PSVersionTable.PSVersion -ge '5.0' )
-    {
+    } elseif(($DependencyVersion -eq "latest") -and ($RemoteAvailable) -and $PSVersionTable.PSVersion -ge '5.0' ) {
         # For latest GitHub tags
         $Destination = Join-Path $TargetPath $GitHubVersion
-    }
-    elseif($PSVersionTable.PSVersion -ge '5.0' -and $TargetType -eq 'Parallel')
-    {
+    } elseif($PSVersionTable.PSVersion -ge '5.0' -and $TargetType -eq 'Parallel') {
         # For GitHub branches
         $Destination = Join-Path $TargetPath $DependencyVersion
         $Destination = Join-Path $Destination $DependencyName
-    }
-    else
-    {
+    } else {
         $Destination = $TargetPath
     }
 
-    if($Force -and (Test-Path -Path $Destination))
-    {
+    if($Force -and (Test-Path -Path $Destination)) {
         Remove-Item -Path $Destination -Force -Recurse
     }
 
     Write-Verbose "Copying [$($ToCopy.Count)] items to destination [$Destination] with`nTarget [$TargetPath]`nName [$DependencyName]`nVersion [$DependencyVersion]`nGitHubVersion [$GitHubVersion]"
 
-    foreach($Item in $ToCopy)
-    {
+    foreach($Item in $ToCopy) {
         Copy-Item -Path $Item -Destination $Destination -Force -Recurse
     }
 
@@ -553,18 +473,14 @@ if(($PmirinAction -contains 'Install') -and $ShouldInstall)
 }
 
 # Conditional import
-if($ModuleExisting)
-{
+if($ModuleExisting) {
     Import-PmirinModule -Name $TargetPath -Action $PmirinAction
-}
-elseif($PmirinAction -contains 'Import')
-{
+} elseif($PmirinAction -contains 'Import') {
     Write-Warning "[$DependencyName] at [$TargetPath] should be imported, but does not exist"
 }
 
 # Return true or false if Test action is wanted
-if($PmirinAction -contains 'Test')
-{
+if($PmirinAction -contains 'Test') {
     return $ModuleExistingMatches
 }
 

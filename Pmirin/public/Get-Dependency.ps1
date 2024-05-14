@@ -159,7 +159,7 @@ function Get-Dependency {
 		[hashtable]$Credentials
     )
 
-    # REGION functions{{{
+# REGION functions{{{
     # Helper to pick from global pmirinoptions, or return a default
     function Get-GlobalOption {
         param(
@@ -418,7 +418,7 @@ function Get-Dependency {
 
 		return $credential
 	}
-    # ENDREGION functions}}}
+# ENDREGION functions}}}
 
     if($PSCmdlet.ParameterSetName -eq 'File') {
         $ParsedDependencies = foreach($DependencyPath in $Path) {
