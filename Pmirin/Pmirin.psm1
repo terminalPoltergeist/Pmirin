@@ -1,4 +1,3 @@
-
 $ModuleRoot = $PSScriptRoot
 # REGION source public and private functions
 $dotSourceParams = @{
