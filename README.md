@@ -1,42 +1,37 @@
-This repo merged in [PSDepend](https://github.com/RamblingCookieMonster/PSDepend). PSDepend is unmaintained as of Dec 2020. I will try to rebuild and expand upon what's here. This module will retain its original MIT license.
+# ~~PSDepend~~ Pmirin
 
----
+*This repository is a derivative of [PSDepend](https://github.com/RamblingCookieMonster/PSDepend). See [about](#about) for more details.*
 
-[![Build status](https://ci.appveyor.com/api/projects/status/4mwhsx9pkfpc1j48/branch/master?svg=true)](https://ci.appveyor.com/project/RamblingCookieMonster/psdepend/branch/master)
+This is a simple PowerShell dependency handler.  You might loosely compare it to `bundle install` in the Ruby world or `pip install -r requirements.txt` if you work with Python.
 
-PSDepend
-========
-
-This is a simple PowerShell dependency handler.  You might loosely compare it to `bundle install` in the Ruby world or `pip install -r requirements.txt` in the Python world.
-
-PSDepend allows you to write simple requirements.psd1 files that describe what dependencies you need, which you can invoke with `Invoke-PSDepend`
+Pmirin allows you to write simple requirements.psd1 files that describe what dependencies you need, which you can invoke with `Invoke-Pmirin`
 
 **WARNING**:
 
-* Minimal testing.  This is in my backlog, but PRs would be welcome!
+* Minimal testing.  This is in the backlog, but PRs would be welcome!
 * This borrows quite heavily from PSDeploy.  There may be leftover components that haven't been adapted, have been improperly adapted, or shouldn't have been adapted
 * Would love ideas, feedback, pull requests, etc., but if you rely on this, consider pinning a specific version to avoid hitting breaking changes.
 
 ## Getting Started
 
-### Installing PSDepend
+### Installing Pmirin
 
 ```powershell
-# PowerShell 5
-Install-Module PSDepend
+# PowerShell 6
+Install-Module Pmirin
 
 # PowerShell 3 or 4, curl|bash bootstrap. Read before running something like this : )
-iex (new-object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/RamblingCookieMonster/PSDepend/master/Examples/Install-PSDepend.ps1')
+iex (new-object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/terminalPoltergeist/Pmirin/master/Examples/Install-Pmirin.ps1')
 
 # Git
     # Download the repository
-    # Unblock the zip
-    # Extract the PSDepend folder to a module path (e.g. $env:USERPROFILE\Documents\WindowsPowerShell\Modules\)
+    # Uncompress the zip
+    # Extract the Pmirin folder to a module path (e.g. $env:USERPROFILE\Documents\WindowsPowerShell\Modules\)
 
 # Import and start exploring
-Import-Module PSDepend
-Get-Command -Module PSDepend
-Get-Help about_PSDepend
+Import-Module Pmirin
+Get-Command -Module Pmirin
+Get-Help about_Pmirin
 ```
 
 ### Example Scenarios
@@ -52,7 +47,7 @@ Recipes:
 
 ## Defining Dependencies
 
-Store dependencies in a PowerShell data file, and use *.depend.psd1 or requirements.psd1 to allow Invoke-PSDepend to find your files for you.
+Store dependencies in a PowerShell data file named `requirements.psd1` to allow Invoke-Pmirin to find your files for you.
 
 What does a dependency file look like?
 
@@ -71,7 +66,7 @@ Here's the simplest syntax.  If this meets your needs, you can stop here:
 }
 ```
 
-And what PSDepend sees:
+And what Pmirin sees:
 
 ```
 DependencyName                   DependencyType  Version Tags
@@ -158,18 +153,18 @@ Raw            : {Version, Name, Tags, DependsOn...}
 
 Note that we replace certain strings in Target and Source fields:
 
-* $PWD (or .) refer to the current path
-* $ENV:USERPROFILE, $ENV:TEMP, $ENV:ProgramData, $ENV:APPDATA
-* Variables need to be in single quotes or the $ needs to be escaped.  We replace the raw strings with the values for you. This will not work: Target = "$PWD\dependencies".  This will: Target = '$PWD\dependencies'
-* If you call Invoke-PSDepend -Target $Something, we override any value for target
-* Thanks to Mike Walker for the idea!
+- $PWD (or .) refer to the current path
+- $ENV:USERPROFILE, $ENV:TEMP, $ENV:ProgramData, $ENV:APPDATA
+- Variables need to be in single quotes or the $ needs to be escaped.  We replace the raw strings with the values for you. This will not work: Target = "$PWD\dependencies".  This will: Target = '$PWD\dependencies'
+- If you call Invoke-PSDepend -Target $Something, we override any value for target
+- Thanks to Mike Walker for the idea!
 
 ### Repository Credentials
 
 If you are using a PowerShell module repository that requires authentication then add those to your dependency. When working with credentials there are two parts we need to consider:
 
-* Credential property of our dependency.
-* Credentials parameter for Invoke-PSDepend.
+- Credential property of our dependency.
+- Credentials parameter for Invoke-PSDepend.
 
 ```powershell
 @{
@@ -191,7 +186,7 @@ If you are using a PowerShell module repository that requires authentication the
 Now create a `PSCredential` object with the credentials to access the repository and run it:
 
 ```powershell
-Invoke-PSDepend -Path C:\requirements.psd1 -Credentials @{ 'must_match' = $creds }
+Invoke-Pmirin -Path C:\requirements.psd1 -Credentials @{ 'must_match' = $creds }
 ```
 
 Make sure whatever you use as `must_match` is the same in the dependency as it is in the hashtable you pass to the Credentials parameter.
@@ -203,7 +198,7 @@ Each DependencyType - PSGalleryModule, FileDownload, Task, etc. - might treat th
 How do we find out what these mean?  First things first, let's look at what DependencyTypes we have available:
 
 ```powershell
-Get-PSDependType
+Get-PmirinType
 ```
 
 ```
@@ -218,7 +213,7 @@ FileDownload    Download a file                                             C:\.
 Now that we know what types are available, we can read the comment-based help.  Hopefully the author took their time to write this:
 
 ```PowerShell
-Get-PSDependType -DependencyType PSGalleryModule -ShowHelp
+Get-PmirinType -DependencyType PSGalleryModule -ShowHelp
 ```
 
 ```
@@ -366,6 +361,22 @@ DependencyName    Status                 BoundParameters                        
 --------------    ------                 ---------------                               -------
 ExampleDependency Invoking Import action {StringParameter, PSDependAction, Dependency} Version [1]
 ```
+
+## About
+
+This repository is a derivative of [PSDepend](https://github.com/RamblingCookieMonster/PSDepend).
+
+PSDepend has been unmaintained since Dec 2020. I have been working on some projects at work that a module like this would be useful for, so I forked the project with a plan to resurrect it. Warren is a genius with Powershell and I can only hope to revitalize this inimitable project.
+
+At the moment all functionality is nearly identical to the original. Feature additions and changes can be found in the eventual [CHANGELOG](CHANGELOG.md).
+
+This derivation retains PSDepend's original [MIT Licence](./LICENSE)
+
+*Why is it called Pmirin?*
+
+I didn't want to use the same name as the original repository because that opens the possibility for the assumption that the projects are maintained by the same people and in the same manner. By starting a derivative, this project can have it's own version history.
+
+The name Pmirin was picked because I like libraries and modules to have fun names. It was influenced by a separate module I use often called Psake (pronounced "sah-keh", like the rice-wine). Of course mirin is also a type of rice-wine and the "P" in "Pmirin" is silent.
 
 ## Notes
 
