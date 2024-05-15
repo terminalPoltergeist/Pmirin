@@ -188,10 +188,13 @@ if($DependencyVersion -eq "") {
 }
 
 # check if dependency version is a semantic version, with or without a 'v' prefix
+#  NOTE: for the remainder of this script $DependencyVersion will be exactly when the user listed in the dependency file.
+# ie. if the user specifies a dependency version of 'v1.0.0', $DependencyVersion will include the 'v'. This is necessary for retrieving the correct tag from GitHub.
+# $SemanticVersion will be a System.Version type with only a major.minor.patch value. This distinction is made for easier comparison of versions.
 if($DependencyVersion -match "^v?\d+(?:\.\d+)+$") {
     $match = $DependencyVersion | Select-String -Pattern "^v?(\d+(?:\.\d+)+)$"
+    # extract and cast the version number from the dependency version
     $SemanticVersion = [System.Version]($match.Matches.Groups | Where-Object Name -eq 1).Value
-    # $DependencyVersion = New-Object "System.Version" $semanticVersion
 }
 
 if ($script:IsCoreCLR) {
@@ -268,9 +271,8 @@ if($Module) {
 
 if($ModuleExisting) {
     Write-Verbose "Found existing module [$DependencyName]"
-    $ExistingVersions = $Module | Select-Object -ExpandProperty "Version"
+    [System.Version]$ExistingVersions = $Module | Select-Object -ExpandProperty "Version"
 
-    # Check if the version that is should be used is a version number
     if($SemanticVersion) {
         :versionslocal foreach($ExistingVersion in $ExistingVersions) {
             switch($ExistingVersion.CompareTo($SemanticVersion)) {
@@ -311,6 +313,7 @@ if($ShouldInstall) {
                 $GitHubTags = Invoke-RestMethod -Uri "https://api.github.com/repos/$DependencyID/tags?per_page=100&page=$Page"
             } catch {
                 if ($Dependency.Credential){
+                    Write-Verbose -Message "Detected credential. Attempting to authenticate with GitHub."
                     $GitHubTags = Invoke-RestMethod -Uri "https://api.github.com/repos/$DependencyID/tags?per_page=100&page=$Page" -Headers @{"Authorization" = "Bearer $($Dependency.Credential)"}
                 } else {
                     throw $_
@@ -319,10 +322,10 @@ if($ShouldInstall) {
 
             if($GitHubTags) {
                 foreach($GitHubTag in $GitHubTags) {
-                    if($GitHubTag.name -match "^v?\d+(?:\.\d+)+$" -and ($SemanticVersion -or $DependencyVersion -eq "latest")) {
+                    if($GitHubTag.name -match "^v?\d+(?:\.\d+)+$" -and ($SemanticVersion -or ($DependencyVersion -eq "latest"))) {
                         $match = $GitHubTag.Name | Select-String -Pattern "^v?(\d+(?:\.\d+)+)$"
                         $GitHubSemanticVersion = [System.Version]($match.Matches.Groups | Where-Object Name -eq 1).Value
-                        $GitHubVersion = New-Object "System.Version" $GitHubTag.name
+                        $GitHubVersion = $GitHubTag.name
 
                         if($DependencyVersion -Eq "latest") {
                             $SemanticVersion = $GitHubSemanticVersion
@@ -335,7 +338,7 @@ if($ShouldInstall) {
                                 break
                             }
                             0 {
-                                Write-Verbose "For [$DependencyName], a matching version [$DependencyVersion] has been found in the GitHub tags"
+                                Write-Verbose "For [$DependencyName], a version matching [$DependencyVersion] has been found in the GitHub tags"
                                 $RemoteAvailable = $true
                                 break nullcheck
                             }
@@ -379,9 +382,19 @@ if($ShouldInstall) {
         }
     } else {
         Write-Verbose "[$DependencyID] has no tags on GitHub or [$DependencyVersion] is a branchname"
-        # Translate version "latest" to "master"
+        try {
+            $GitHubRepo = Invoke-RestMethod -Uri "https://api.github.com/repos/$DependencyID"
+        } catch {
+            if ($Dependency.Credential){
+                Write-Verbose -Message "Detected credential. Attempting to authenticate with GitHub."
+                $GitHubRepo = Invoke-RestMethod -Uri "https://api.github.com/repos/$DependencyID" -Headers @{"Authorization" = "Bearer $($Dependency.Credential)"}
+            } else {
+                throw $_
+            }
+        }
+        # Translate version "latest" to the default branch
         if($DependencyVersion -eq "latest") {
-            $DependencyVersion = "main"
+            $DependencyVersion = $GitHubRepo | Select-Object -ExpandProperty 'default_branch'
         }
 
         # Link for a .zip archive of the repository's branch
@@ -399,7 +412,7 @@ if(($PmirinAction -contains 'Install') -and $ShouldInstall) {
     # Create a temporary directory and download the repository to it
     $OutPath = Join-Path ([System.IO.Path]::GetTempPath()) ([guid]::NewGuid().guid)
     New-Item -ItemType Directory -Path $OutPath -Force | Out-Null
-    $OutFile = Join-Path $OutPath "$DependencyVersion.zip"
+    $OutFile = Join-Path $OutPath "$SemanticVersion.zip"
     if ($null -eq $Dependency.Credential) {
         Invoke-RestMethod -Uri $URL -OutFile $OutFile
     } else {
@@ -459,10 +472,10 @@ if(($PmirinAction -contains 'Install') -and $ShouldInstall) {
         $Destination = $TargetPath
     } elseif($SemanticVersion -match "^\d+(?:\.\d+)+$" -and $PSVersionTable.PSVersion -ge '5.0'  ) {
         # For versioned GitHub tags
-        $Destination = Join-Path $TargetPath $DependencyVersion
+        $Destination = Join-Path $TargetPath $SemanticVersion
     } elseif(($DependencyVersion -eq "latest") -and ($RemoteAvailable) -and $PSVersionTable.PSVersion -ge '5.0' ) {
         # For latest GitHub tags
-        $Destination = Join-Path $TargetPath $GitHubVersion
+        $Destination = Join-Path $TargetPath $GitHubSemanticVersion
     } elseif($PSVersionTable.PSVersion -ge '5.0' -and $TargetType -eq 'Parallel') {
         # For GitHub branches
         $Destination = Join-Path $TargetPath $DependencyVersion
