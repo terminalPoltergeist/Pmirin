@@ -412,7 +412,7 @@ if(($PmirinAction -contains 'Install') -and $ShouldInstall) {
     # Create a temporary directory and download the repository to it
     $OutPath = Join-Path ([System.IO.Path]::GetTempPath()) ([guid]::NewGuid().guid)
     New-Item -ItemType Directory -Path $OutPath -Force | Out-Null
-    $OutFile = Join-Path $OutPath "$SemanticVersion.zip"
+    $OutFile = Join-Path $OutPath "$DependencyVersion.zip"
     if ($null -eq $Dependency.Credential) {
         Invoke-RestMethod -Uri $URL -OutFile $OutFile
     } else {
@@ -439,6 +439,11 @@ if(($PmirinAction -contains 'Install') -and $ShouldInstall) {
 
     $OutPath = (Get-ChildItem -Path $OutPath)[0].FullName
     $OutPath = (Rename-Item -Path $OutPath -NewName $DependencyName -PassThru).FullName
+    if ($DependencyVersion -notmatch "^v?\d+(?:\.\d+)+$") {
+        # safe to assume $DependencyVersion is a branch name, attempt to find the version
+        $SemanticVersion = (Get-Module -ListAvailable (Join-Path $OutPath $DependencyName) | Select-Object -ExpandProperty Version).ToString()
+        Write-Verbose -Message "For [$DependencyName] version [$DependencyVersion] found semantic version [$SemanticVersion]"
+    }
 
     if($ExtractPath) {
         # Filter only the contents wanted
@@ -478,8 +483,7 @@ if(($PmirinAction -contains 'Install') -and $ShouldInstall) {
         $Destination = Join-Path $TargetPath $GitHubSemanticVersion
     } elseif($PSVersionTable.PSVersion -ge '5.0' -and $TargetType -eq 'Parallel') {
         # For GitHub branches
-        $Destination = Join-Path $TargetPath $DependencyVersion
-        $Destination = Join-Path $Destination $DependencyName
+        $Destination = Join-Path $TargetPath $SemanticVersion
     } else {
         $Destination = $TargetPath
     }
