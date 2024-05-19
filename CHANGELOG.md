@@ -23,4 +23,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Support for GitHub credentials.
+- Support GitHub credentials. ([`d10910c`](https://github.com/terminalPoltergeist/Pmirin/commit/d10910cb80ff258a3c079a1bf8ac3de45bc33d03))
