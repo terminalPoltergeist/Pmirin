@@ -8,6 +8,7 @@ We pull down some dependencies and import them directly, regardless of whether w
 
 ```powershell
 # Set up a project folder, and a requirements.psd1
+```powershell
 mkdir C:\ProjectX -force
 Set-Content C:\ProjectX\Requirements.psd1 -Value @'
 @{
