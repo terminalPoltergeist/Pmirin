@@ -441,7 +441,8 @@ if(($PmirinAction -contains 'Install') -and $ShouldInstall) {
     $OutPath = (Rename-Item -Path $OutPath -NewName $DependencyName -PassThru).FullName
     if ($DependencyVersion -notmatch "^v?\d+(?:\.\d+)+$") {
         # safe to assume $DependencyVersion is a branch name, attempt to find the version
-        $SemanticVersion = (Get-Module -ListAvailable (Join-Path $OutPath $DependencyName) | Select-Object -ExpandProperty Version).ToString()
+        $module = Get-Module -ListAvailable $(Get-ChildItem $OutPath -Recurse | Where-Object Name -Like "*.psm1" | Select-Object -ExpandProperty FullName)
+        $SemanticVersion = ($module | Select-Object -ExpandProperty Version).ToString()
         Write-Verbose -Message "For [$DependencyName] version [$DependencyVersion] found semantic version [$SemanticVersion]"
     }
 
