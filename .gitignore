@@ -1,3 +1,4 @@
 nuget.exe
 PSDepend
 requirements.psd1
+testing.ps1
