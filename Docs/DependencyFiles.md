@@ -67,3 +67,5 @@ Dependency definitions can use a few different syntaxes:
       }
     }
     ```
+
+These syntaxes can be mixed-and-matched in a sinlge Pmirin file.
