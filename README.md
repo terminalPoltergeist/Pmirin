@@ -376,7 +376,7 @@ This derivation retains PSDepend's original [MIT Licence](./LICENSE)
 
 I didn't want to use the same name as the original repository because that opens the possibility for the assumption that the projects are maintained by the same people and in the same manner. By starting a derivative, this project can have it's own version history.
 
-The name Pmirin was picked because I like libraries and modules to have fun names. It was influenced by a separate module I use often called Psake (pronounced "sah-keh", like the rice-wine). Of course mirin is also a type of rice-wine and the "P" in "Pmirin" is silent.
+The name Pmirin was picked because I like libraries and modules to have fun names. It was influenced by a separate module I use often called Psake (pronounced "sah-keh", like the rice-wine). Of course mirin is also a type of rice-wine and the "P" in "Pmirin" is silent. "meer-in" (/m/ɪə/ŋ).
 
 ## Notes
 
