@@ -276,7 +276,7 @@ if($Module) {
 
 if($ModuleExisting) {
     Write-Verbose "Found existing module [$DependencyName]"
-    [System.Version]$ExistingVersions = $Module | Select-Object -ExpandProperty "Version"
+    [System.Version[]]$ExistingVersions = $Module | Select-Object -ExpandProperty "Version"
 
     if($null -ne $SemanticVersion) {
         :versionslocal foreach($ExistingVersion in $ExistingVersions) {
