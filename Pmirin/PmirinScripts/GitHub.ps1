@@ -180,7 +180,12 @@ Write-Verbose -Message "Am I on Windows? [$script:IsWindows]! Am I PS Core? [$sc
 $DependencyID = $Dependency.DependencyName
 $DependencyVersion = $Dependency.Version
 $DependencyTarget = $Dependency.Target
-$DependencyName = $DependencyID.Split("/")[1]
+# if an alternative name is specified for the module, use that, otherwise use the dependency id name
+if ($Dependency.Name) {
+    $DependencyName = $Dependency.Name
+} else {
+    $DependencyName = $DependencyID.Split("/")[1]
+}
 
 # defaults to the latest version of the dependency
 if($DependencyVersion -eq "") {
