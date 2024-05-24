@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Existing version discovery for multiple versions of a module. ([`7fe1013`](https://github.com/terminalPoltergeist/Pmirin/commit/7fe101300e718b0a1185f83b2715ca934c313f63))
+
 ### Security
 
 ## [0.1.2] - 2024-05-24
