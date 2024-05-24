@@ -19,6 +19,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
+## [0.1.2] - 2024-05-24
+
+### Fixed
+
+- Naming issues during installation of dependencies from GitHub. ([`be46666`](https://github.com/terminalPoltergeist/Pmirin/commit/be466668dded8518c355f24d157bbef42462d756), [`9e8fc88`](https://github.com/terminalPoltergeist/Pmirin/commit/9e8fc884c5c129619acc7d01f536e88fd5d7ddf2), [`5fe27dc`](https://github.com/terminalPoltergeist/Pmirin/commit/5fe27dc246fa6e3e7c7202bca5bf62fb0c42f80e))
+
 ## [0.1.1] - 2024-05-20
 
 ### Fixed
