@@ -278,7 +278,7 @@ if($ModuleExisting) {
     Write-Verbose "Found existing module [$DependencyName]"
     [System.Version]$ExistingVersions = $Module | Select-Object -ExpandProperty "Version"
 
-    if($SemanticVersion) {
+    if($null -ne $SemanticVersion) {
         :versionslocal foreach($ExistingVersion in $ExistingVersions) {
             switch($ExistingVersion.CompareTo($SemanticVersion)) {
                 {@(-1, 1) -contains $_} {
@@ -446,7 +446,7 @@ if(($PmirinAction -contains 'Install') -and $ShouldInstall) {
     $OutPath = (Rename-Item -Path $OutPath -NewName $DependencyName -PassThru).FullName
     if ($DependencyVersion -notmatch "^v?\d+(?:\.\d+)+$") {
         # safe to assume $DependencyVersion is a branch name, attempt to find the version
-        $module = Get-Module -ListAvailable $(Get-ChildItem $OutPath -Recurse | Where-Object Name -Like "*.psd1" | Select-Object -ExpandProperty FullName)
+        $module = Get-Module -ListAvailable $(Get-ChildItem $OutPath -Recurse | Where-Object Name -Like "*.psd1" | Select-Object -ExpandProperty FullName) | Where-Object Name -eq $DependencyName 
         $SemanticVersion = ($module | Select-Object -ExpandProperty Version).ToString()
         Write-Verbose -Message "For [$DependencyName] version [$DependencyVersion] found semantic version [$SemanticVersion]"
     }
