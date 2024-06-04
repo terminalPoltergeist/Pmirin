@@ -447,8 +447,12 @@ if(($PmirinAction -contains 'Install') -and $ShouldInstall) {
     if ($DependencyVersion -notmatch "^v?\d+(?:\.\d+)+$") {
         # safe to assume $DependencyVersion is a branch name, attempt to find the version
         $module = Get-Module -ListAvailable $(Get-ChildItem $OutPath -Recurse | Where-Object Name -Like "*.psd1" | Select-Object -ExpandProperty FullName) | Where-Object Name -eq $DependencyName 
-        $SemanticVersion = ($module | Select-Object -ExpandProperty Version).ToString()
-        Write-Verbose -Message "For [$DependencyName] version [$DependencyVersion] found semantic version [$SemanticVersion]"
+        if ($null -ne $module) {
+            $SemanticVersion = ($module | Select-Object -ExpandProperty Version).ToString()
+            Write-Verbose -Message "For [$DependencyName] version [$DependencyVersion] found semantic version [$SemanticVersion]"
+        } else {
+            Write-Verbose -Message "Could not find a module with name [$DependencyName]."
+        }
     }
 
     if($ExtractPath) {

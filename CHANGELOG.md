@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Handle error when attempting to discover semantic version for non-existing module. ([`0873d0e`](https://github.com/terminalPoltergeist/Pmirin/commit/0873d0e3c30408265ee41dfe9b810436f62cc3dd))
 - Existing version discovery for multiple versions of a module. ([`7fe1013`](https://github.com/terminalPoltergeist/Pmirin/commit/7fe101300e718b0a1185f83b2715ca934c313f63))
 
 ### Security
