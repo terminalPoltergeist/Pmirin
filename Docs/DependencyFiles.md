@@ -43,10 +43,11 @@ Dependency definitions can use a few different syntaxes:
     - `Name` is the local name to give the dependency. (ex. if specifying a GitHub dependency, 'user/repo' would be the dependency key and the name option could then be 'repo').
     - `Version` specifies the dependency version.
     - `Parameters` is a hash-table of Parameters to pass to the PmirinScript for resolving the dependency. See [PmirinScripts](../Pmirin/PmirinScripts) for available Parameters for each dependency type.
+    - `Credential` creates a named credential that is used to authenticate with the upstream source of the dependency. It is assigned by running `Invoke-Pmirin -Credentials @{'Bearer' = 'the_bearer_token'}` where 'Bearer' is the name you gave the credential in the requirements.psd1 file. The credentials hashtable can contain as many credential mappings as defined in the requirements file.
     - `Source` is used by some dependency resolver scripts for locating the dependency. ex. for dependencies on a file share you would provide the path to the file share.
     - `Target` is the local target to install the dependency to; a path.
     - `AddToPath` boolean for whether to add the dependency to the PSModulePath.
-    - `Tags` collection of strings giving tags to label the dependency with. ex. 'prod', 'text', etc.
+    - `Tags` collection of strings giving tags to label the dependency with. ex. 'prod', 'test', etc.
     - `DependsOn` specifies dependencies that need to run before resolving this one.
     - `PreScripts` path(s) to script(s) to run before the dependency is resolved.
     - `PostScripts` path(s) to script(s) to run after the dependency is resolved.
@@ -56,8 +57,9 @@ Dependency definitions can use a few different syntaxes:
       'myOrg/myDependency' = @{
         DependencyType = "GitHub"
         Version = '1.0.0'
+        Credential = 'Bearer'
         Parameters = @{
-          Credentials = @{'Bearer' = "access_token_here"}
+          ExtractPath = 'src/'
         }
         Target = 'path/to/my/project'
         AddToPath = $true
