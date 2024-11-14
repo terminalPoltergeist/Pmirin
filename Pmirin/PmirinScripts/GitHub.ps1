@@ -319,7 +319,7 @@ if($ShouldInstall) {
             } catch {
                 if ($Dependency.Credential){
                     Write-Verbose -Message "Detected credential. Attempting to authenticate with GitHub."
-                    $GitHubTags = Invoke-RestMethod -Uri "https://api.github.com/repos/$DependencyID/tags?per_page=100&page=$Page" -Headers @{"Authorization" = "Bearer $($Dependency.Credential)"}
+                    $GitHubTags = Invoke-RestMethod -Uri "https://api.github.com/repos/$DependencyID/tags?per_page=100&page=$Page" -Headers @{"Authorization" = "Bearer $($Dependency.Credential | ConvertFrom-SecureString -AsPlainText)"}
                 } else {
                     throw $_
                 }
@@ -392,7 +392,7 @@ if($ShouldInstall) {
         } catch {
             if ($Dependency.Credential){
                 Write-Verbose -Message "Detected credential. Attempting to authenticate with GitHub."
-                $GitHubRepo = Invoke-RestMethod -Uri "https://api.github.com/repos/$DependencyID" -Headers @{"Authorization" = "Bearer $($Dependency.Credential)"}
+                $GitHubRepo = Invoke-RestMethod -Uri "https://api.github.com/repos/$DependencyID" -Headers @{"Authorization" = "Bearer $($Dependency.Credential | ConvertFrom-SecureString -AsPlainText)"}
             } else {
                 throw $_
             }
@@ -421,7 +421,7 @@ if(($PmirinAction -contains 'Install') -and $ShouldInstall) {
     if ($null -eq $Dependency.Credential) {
         Invoke-RestMethod -Uri $URL -OutFile $OutFile
     } else {
-        Invoke-RestMethod -Uri $URL -OutFile $OutFile -Headers @{"Authorization" = "Bearer $($Dependency.Credential)"}
+        Invoke-RestMethod -Uri $URL -OutFile $OutFile -Headers @{"Authorization" = "Bearer $($Dependency.Credential | ConvertFrom-SecureString -AsPlainText)"}
     }
 
     if(-not (Test-Path $OutFile)) {
