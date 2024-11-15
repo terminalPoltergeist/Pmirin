@@ -188,7 +188,7 @@ function Invoke-Pmirin {
         $plainTextCreds = $Credentials.Keys | Where-Object {$Credentials[$_].GetType().Name -ne 'SecureString'}
         foreach ($name in $plainTextCreds) {
             Write-Verbose "Converting $name credential to SecureString"
-            $Credentials[$name] = (ConvertTo-SecureString -String $Credentials[$name] -AsPlainText)
+            $Credentials[$name] = (ConvertTo-SecureString -String $Credentials[$name] -AsPlainText -Force)
         }
         Write-Verbose "Running Invoke-Pmirin with ParameterSetName $($PSCmdlet.ParameterSetName), PmirinAction $($InvokeParams.PmirinAction), and params: $($PSBoundParameters | Out-String)"
 
