@@ -19,6 +19,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
+## [0.1.4] - 2024-11-14
+
+### Fixed
+
+- Credential encryption compatibility with older Powershell versions.
+  ([`3171eb2`](https://github.com/terminalPoltergeist/Pmirin/commit/3171eb2b67566bf8f6d1d67703fe771f90f2fe90))
+
 ## [0.1.3] - 2024-11-14
 
 ### Fixed
